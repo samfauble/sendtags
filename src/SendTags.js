@@ -2,9 +2,9 @@ import React, {useState} from 'react'
 
 export default function SendTags () {
     const [recipients, updateRecipients] = useState("")
-    const [tags, updateTags] = useState("")
+    const [tags, updateTags] = useState("") 
     const [config, updateConfig] = useState("")
-    const [sendTo, updateSendTo] = useState("")
+    const [sendTo, updateSendTo] = useState("") 
     const [sendType, updateSendType] = useState("")
     const [sent, updateSent] = useState(false)
 
