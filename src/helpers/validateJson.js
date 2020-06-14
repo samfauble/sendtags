@@ -37,30 +37,40 @@ const sendTypeValidation = (sendType) => {
     }
 }
 
+const alignmentValidation = (stateSlice) => {
+    const {parsedTags, parsedSendTo} = stateSlice;
+    for(let item in parsedSendTo){
+        console.log(parsedTags, parsedSendTo, parsedSendTo[item])
+        if(parsedTags.includes(parsedSendTo[item])) {
+            continue;
+        } else {
+            throw new ValidationError("Include only tags found in the Tags section.", "sendTo")
+        }
+    }
+}
+
 const tryCatch = (stateSlice, validator, stateUpdate) => {
     try {
         validator(stateSlice)
     } catch (e) {
         stateUpdate(`"${e.id}" is improperly formatted. ${e.message}`)
-        return (e.message, e.id)
+        return e.id
     }
     stateUpdate(null)
 }
 
-export const validateJson = (state, updateTagsError, updateConfigError, updateSendToError, updateAndOrError) => {
+export const validateJson = (state, updateTagsError, updateConfigError, updateSendToError, updateAndOrError, updateTagAlignmentError) => {
     const { tags, config, sendTo, sendType } = state
+    const parsedTags = tags.split(",")
+    const parsedSendTo = sendTo.split(",")
+
     const tryTag = tryCatch(tags, tagValidation, updateTagsError)
     const tryConfig = tryCatch(config, configValidation, updateConfigError)
     const trySendTo = tryCatch(sendTo, sendToValidation, updateSendToError)
+    const tryAlignment = tryCatch({parsedTags, parsedSendTo}, alignmentValidation, updateTagAlignmentError)
     const trySendType = tryCatch(sendType, sendTypeValidation, updateAndOrError)
 
-    const errorList = [tryTag, tryConfig, trySendTo, trySendType]
-    errorList.filter((item) => {
-        if(!item){
-            return false
-        } else {
-            return true
-        }
-    })
+    const errorList = [tryTag, tryConfig, trySendTo, trySendType, tryAlignment]
+    console.log(errorList)
     return errorList
 }
