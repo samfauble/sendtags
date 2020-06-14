@@ -1,0 +1,98 @@
+﻿Plan:
+Requirements:
+* Implement the send tags feature. Feature should:
+1. Update component state with the change of each text field
+2. Upon submission, display a notification to whom the messages were sent
+
+
+Function plan notes:
+
+
+onChange handler: 
+Data Design:
+Tags => string [ ]                                                >>>>>
+configPersons => JSON :: { stringKey: string [ ] }                >>>>>                JSON :: { }
+sendTo => string [ ]                                                >>>>>                                
+sendType => enumeration :: (“AND”, “OR”)                         >>>>>
+
+
+Purpose: Given a change event in a text box, return new state to reflect changes
+
+
+
+
+onSubmit handler:
+Data Design:
+JSON :: { }  >>>>  string [ ]
+
+
+Purpose: Return a filtered list of recipients to be sent the message
+
+
+Expected input format:
+{
+        tags: [ “” ],
+        config: {
+        “” : [ “”  ]
+},
+sendTo: [ “” ],
+sendType: { “AND”, “OR” }
+}
+
+
+Testing area dimensions:
+* JSON schema validation
+* value for sendType is “AND” or “OR”
+* value for tags is list of string
+* value for config is object
+* each k-v pair in config is string: listOfString
+* each item in k-v pair value is in tags
+* sendTo is list of string
+* sendTo tags found in tags
+* all items in sendTo are found in tags
+* config and sendTo matching
+* If “AND”:
+1. each config to be appended to receivers must have at least all of the mentioned sendTo tags (can have more)
+* If “OR”:
+1. each config to be appended to receivers must have at least 1 of the mentioned sendTo tags (can have all)
+* 
+
+Planned Iterations:
+1. Implement tests
+2. Get all tests to pass with a working, naive solution
+3. Add a JSON schema validator for onSubmit handler input
+4. Refactor to implement useReducer for onChange handler
+5. Optimize for efficiency, if applicable
+6. Improve UI
+
+
+
+
+
+
+Results:
+What I completed:
+* Code restructuring (state Hooks => reducer Hook)
+* Core functionality (onChange and onSubmit handlers) 
+* Input validation 
+* UI error handling 
+* UI improvements (Material UI components)        
+* Test stubs for optimal, expected results
+ 
+Challenges I faced:
+* Fuzzy requirements
+* I documented what I thought to be the requirements and listed them above. This helped me keep them in mind while developing.
+* Input validation
+* There were a number of different factors that needed to be validated
+* In the end, I chose a handful of factors to focus on
+* I implemented the validation checks in such a way that made it easy to scale up in case I decided I wanted to add more validation checks.
+
+What I would improve on:
+* If given more time, I would’ve given more attention to testing, both creating test stubs for exceptions as well as implementing tests. 
+	For front-end testing, I am more familiar with Enzyme and Jest.
+* With regards to the UI, I’d optimize the amount of white space/alignment, change the tagAlignment UI error response, 
+	add tooltips to replace input instructions for “Tags” and “People Configs”, 
+	and maybe include some basic animations for Error/Success message appearance.
+* If I had more time, I would have also implemented the config validation check. 
+	Given all of the parts I would’ve needed to check, I saved that for a later time. 
+	I would also look into type checking using methods other than PropTypes.
