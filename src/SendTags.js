@@ -5,6 +5,7 @@ import { Button, Container, Input } from "@material-ui/core"
 import { matcher } from "./helpers/matcher"
 import { validateInput } from './helpers/validateInput'
 
+//The reducer that handles state and state changes onChange
 function changeReducer(state={}, action) {
     const value = action.value
     switch(action.type) {
@@ -86,16 +87,19 @@ export default function SendTags () {
         event.preventDefault()
         updateSent(false)
 
+        //Check for input errors, 
+        //end the the submit fuction if there is at least one error present
         const errList = validateInput(state, updateTagsError,updateConfigError, updateSendToError, updateAndOrError, updateTagAlignmentError)
         const canContinue = handleErrList(errList)
         if(canContinue === false) { return; }
 
+        //Create a list of recipients
         const { config, sendTo, sendType } = state
         const parsedConfig = JSON.parse(config)
         const parsedSendTo = sendTo.split(",")
-        //create list of recipients
         const recipientList = matcher(sendType, parsedSendTo, parsedConfig)
-        //update state
+        
+        //Update recipient state and sent state
         updateRecipients(recipientList)
         updateSent(true)
     }
@@ -170,16 +174,20 @@ export default function SendTags () {
                 </Container>
             </form>
             <Container style={{"paddingTop": "40px"}}>
-            { tagsError && <div className="error"> Error: {tagsError} </div> }
-            { configError && <div className="error"> Error: {configError} </div> }
-            { sendToError && <div className="error"> Error: {sendToError} </div> }
-            { tagAlignmentError && <div className="error"> Error: {tagAlignmentError} </div> }
-            { andOrError && <div className="error"> Error: {andOrError} </div> }
-            { sent && <div className="success">Sent to: 
-                    {"  " + recipients[0] + "," + recipients.slice(1).map((person) => {
+                { tagsError && <div className="error"> Error: {tagsError} </div> }
+                { configError && <div className="error"> Error: {configError} </div> }
+                { sendToError && <div className="error"> Error: {sendToError} </div> }
+                { tagAlignmentError && <div className="error"> Error: {tagAlignmentError} </div> }
+                { andOrError && <div className="error"> Error: {andOrError} </div> }
+                { sent && 
+                <div className="success">
+                    Sent to:
+                    {recipients.length === 1 ? 
+                    "  " + recipients[0] : 
+                    "  " + recipients[0] + "," + recipients.slice(1).map((person) => {
                         return "   " + person
-                    })}
-            </div> }
+                    })} 
+                </div> }
             </Container>
         </div>
     )
@@ -189,5 +197,9 @@ SendTags.propTypes = {
     state: PropTypes.object,
     recipients: PropTypes.array,
     sendToError: PropTypes.oneOf([String, null]),
+    updateTagsError: PropTypes.oneOf([String, null]), 
+    configError: PropTypes.oneOf([String, null]), 
+    andOrError: PropTypes.oneOf([String, null]),  
+    tagAlignmentError: PropTypes.oneOf([String, null]), 
     sent: PropTypes.bool
 }

@@ -1,5 +1,5 @@
 
-/*         Module Architecture: (as a stack)
+/*                  Module Architecture:
 
     Validator Validator Validator Validator Validator
          ||       ||        ||        ||       ||
@@ -11,7 +11,7 @@
 
 
 
-class ValidationError{
+class ValidationError {
     
     constructor(message, id) {
         this.message = message
@@ -61,6 +61,7 @@ const alignmentValidation = (stateSlice) => {
 }
 
 //Updates error state if error is caught. Else, nullifies error state.
+//Returns error id string if error caught. Else, returns undefined.
 const tryCatch = (stateSlice, validator, stateUpdate) => {
     try {
         validator(stateSlice)

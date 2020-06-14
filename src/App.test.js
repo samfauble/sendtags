@@ -1,10 +1,3 @@
-import React from 'react';
-import Enzyme, { shallow } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-16';
-import SendTags from './SendTags'
-
-Enzyme.configure({ adapter: new Adapter() });
-
 /*
 test('renders learn react link', () => {
   const { getByText } = render(<App />);
@@ -15,8 +8,7 @@ test('renders learn react link', () => {
 
 describe("onChange handler", () => {
   test("add new change to tags attribute", () => {})
-  test("add new change to config attribute", () => {
-  })
+  test("add new change to config attribute", () => {})
   test("add new change to sendTo attribute", () => {})
   test("add new change to sendType attribute", () => {})
   test("persist pre-existing state on new change", () => {})
