@@ -40,7 +40,6 @@ const sendTypeValidation = (sendType) => {
 const alignmentValidation = (stateSlice) => {
     const {parsedTags, parsedSendTo} = stateSlice;
     for(let item in parsedSendTo){
-        console.log(parsedTags, parsedSendTo, parsedSendTo[item])
         if(parsedTags.includes(parsedSendTo[item])) {
             continue;
         } else {
@@ -71,6 +70,5 @@ export const validateJson = (state, updateTagsError, updateConfigError, updateSe
     const trySendType = tryCatch(sendType, sendTypeValidation, updateAndOrError)
 
     const errorList = [tryTag, tryConfig, trySendTo, trySendType, tryAlignment]
-    console.log(errorList)
     return errorList
 }

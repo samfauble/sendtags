@@ -26,7 +26,11 @@ li {
   margin-right: 24%;
   padding: 3px;
   border-radius: 20px;
+}
 
+.spaced {
+  margin-top: 10px;
+  margin-bottom: 5px;
 }
 
 .error {
