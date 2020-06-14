@@ -1,4 +1,8 @@
-import React, {useState, useReducer} from 'react'
+import React, {useState, useReducer, useEffect} from 'react'
+import { matcher } from "./helpers/matcher"
+import { checkSendTo } from "./helpers/sendToChecker"
+import PropTypes from "prop-types"
+import { validateJson } from './helpers/validateJson'
 
 function changeReducer(state={}, action) {
     const value = action.value
@@ -30,89 +34,64 @@ function changeReducer(state={}, action) {
 
 export default function SendTags () {
     const [state, dispatch] = useReducer(changeReducer, {});
-    const [recipients, updateRecipients] = useState("")
+    const [recipients, updateRecipients] = useState([])
     const [sent, updateSent] = useState(false)
+    const [tagsError, updateTagsError] = useState(null)
+    const [configError, updateConfigError] = useState(null)
+    const [sendToError, updateSendToError] = useState(null)
+    const [andOrError, updateAndOrError] = useState(null)
+
+    const errorDomChange = (error, errorName) => {
+        if(error) {
+            document.getElementById(errorName).setAttribute('style', 'border: 3px solid red')
+        } else {
+            document.getElementById(errorName).removeAttribute('style')
+        }
+    }
+
+    useEffect(() => {
+        errorDomChange(tagsError, 'tags')
+        errorDomChange(configError, 'config')
+        errorDomChange(sendToError, 'sendTo')
+        errorDomChange(andOrError, 'sendType')
+    }, ([tagsError, configError, sendToError, andOrError]))
 
     const handleChange = (event) => {
         const value = event.target.value
         const type = event.target.name
         dispatch({type, value})
     }
-    
-    const listConfigPeople = (config) => {
-        const list = []
-        for(let person in config) {
-            list.push(person)
-        }
-        return list
-    }
 
-    const andMatcher = (config, sendTo) => {
-        const list = listConfigPeople(config)
-        const returnList = list.filter((person) => {
-            const attributes = config[person]
-            for(let i = 0; i <= sendTo.length-1; i++) {
-                const tag = sendTo[i]
-                console.log(attributes.includes(tag), tag)
-                if (attributes.includes(tag)) {
-                    continue;
-                } else {
-                    return false
-                } 
-            }
-            return true
-        })
-        return returnList;
-    }
-
-    const orMatcher = (config, sendTo) => {
-        const list = listConfigPeople(config)
-        const returnList = list.filter((person) => {
-            const attributes = config[person]
-            for(let i = 0; i <= sendTo.length-1; i++) {
-                const tag = sendTo[i] 
-                if (attributes.includes(tag)) {
-                    return true
-                }
-            }
-            return false
-        })
-
-        return returnList
-    }
-    
-    const matcherHelper = (sendType, sendTo, config) => {
-        if(sendType === 'OR') {
-            return orMatcher(config, sendTo)
-        } else if (sendType === 'AND') {
-            return andMatcher(config, sendTo)
-        } else {
-            throw new Error("invalid sendType received. Use AND or OR.")
-        }
-    }
 
     const handleSubmit = (event) => {
         event.preventDefault()
         //set updateSent to "false"
         updateSent(false)
         //validate JSON schema
+        const errList = validateJson(state, updateTagsError,updateConfigError, updateSendToError, updateAndOrError)
+        for(let item in errList){
+            if(errList[item] !== undefined && errList[item] !== null){
+                return;
+            }
+        }
         //get all state slices
         const { tags, config, sendTo, sendType } = state
         //parse state slices
-        const parsedTags = tags.split(", ")
+        const parsedTags = tags.split(",")
         const parsedConfig = JSON.parse(config)
-        const parsedSendTo = sendTo.split(", ")
+        const parsedSendTo = sendTo.split(",")
         //make sure sendTo elements are also in "tags"
-        for (let item in parsedSendTo) {
-            if (item in parsedTags) {
-                continue
-            } else {
-                throw new Error("sendTo tag not found in Tags")
-            }
+        try{
+            checkSendTo(parsedTags, parsedSendTo) 
+        } catch(err) {
+            updateSendToError(err.message)
+            return;
         }
+        updateSendToError(null)
         //determine AND or OR
         //match config tags with sendTo tags (if match, append to recipients)
-        const recipientList = matcherHelper(sendType, parsedSendTo, parsedConfig)
+        const recipientList = matcher(sendType, parsedSendTo, parsedConfig)
+        console.log(recipientList)
         updateRecipients(recipientList)
         //once finished, updateSent to "true"
         updateSent(true)
@@ -143,7 +122,18 @@ export default function SendTags () {
                 </label>
                 <input type="submit" value="Send Messages" />
             </form>
+            { tagsError && <div> Error: {tagsError} </div> }
+            { configError && <div> Error: {configError} </div> }
+            { sendToError && <div> Error: {sendToError} </div> }
+            { andOrError && <div> Error: {andOrError} </div> }
             { sent && <div>Sent to: {recipients}</div> }
         </div>
     )
+}
+
+SendTags.propTypes = {
+    state: PropTypes.object,
+    recipients: PropTypes.array,
+    sendToError: PropTypes.oneOf([String, null]),
+    sent: PropTypes.bool
 }
