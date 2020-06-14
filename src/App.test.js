@@ -1,7 +1,6 @@
 import React from 'react';
-import Enzyme, { shallow, mount } from 'enzyme';
+import Enzyme, { shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { empty } from "./testData"
 import SendTags from './SendTags'
 
 Enzyme.configure({ adapter: new Adapter() });
@@ -24,13 +23,7 @@ describe("onChange handler", () => {
 })
 
 describe("onSubmit handler", ()=> {
-  test("no data", () => {
-    const wrapper = shallow(<SendTags />)
-
-    wrapper.find('form').simulate('submit')
-
-    expect(wrapper.instance().handleSubmit()).toThrow(new Error())
-  })
+  test("no data", () => {})
   test("one config pair, no matches", () => {})
   test("one config pair, one match", () => {})
   test("two config pairs, no matches", () => {})

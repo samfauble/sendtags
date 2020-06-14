@@ -1,3 +1,4 @@
+//Returns a processed list of people in the config input
 const listConfigPeople = (config) => {
     const list = []
     for(let person in config) {
@@ -6,6 +7,7 @@ const listConfigPeople = (config) => {
     return list
 }
 
+//Creates list of recipients for "AND" sendType
 const andMatcher = (config, sendTo) => {
     const list = listConfigPeople(config)
     const returnList = list.filter((person) => {
@@ -23,6 +25,7 @@ const andMatcher = (config, sendTo) => {
     return returnList;
 }
 
+//Creates list of recipients for "OR" sendType
 const orMatcher = (config, sendTo) => {
     const list = listConfigPeople(config)
     const returnList = list.filter((person) => {
@@ -39,8 +42,9 @@ const orMatcher = (config, sendTo) => {
     return returnList
 }
 
+//Returns list of recipients depending on sendType
 export const matcher = (sendType, sendTo, config) => {
-    if(sendType === 'OR') {
+    if (sendType === 'OR') {
         return orMatcher(config, sendTo)
     } else if (sendType === 'AND') {
         return andMatcher(config, sendTo)

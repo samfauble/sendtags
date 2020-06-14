@@ -1,4 +1,15 @@
 
+/*         Module Architecture: (as a stack)
+
+    Validator Validator Validator Validator Validator
+         ||       ||        ||        ||       ||
+          \\      ||        ||        ||       //
+            *************tryCatch*************
+                           ||
+                      validateInput
+*/
+
+
 
 class ValidationError{
     
@@ -8,7 +19,7 @@ class ValidationError{
     }
 }
 
-
+//Throws error if any "tags" item contains a space after the comma
 const tagValidation = (tags) => {
     const tagList = tags.split(",")
     for(let item in tagList){
@@ -18,10 +29,9 @@ const tagValidation = (tags) => {
     }
 }
 
-const configValidation = (config) => {
+const configValidation = (config) => {}
 
-}
-
+//Throws error if any sendTo item contains a space after the comma
 const sendToValidation = (sendTo) => {
     const sendToList = sendTo.split(",")
     for(let item in sendToList){
@@ -31,23 +41,26 @@ const sendToValidation = (sendTo) => {
     } 
 }
 
+//Throws error if sendType doesn't equal "OR" or "AND"
 const sendTypeValidation = (sendType) => {
     if(sendType !== "OR" && sendType !== "AND") {
         throw new ValidationError("Enter only AND or OR.", "sendType")
     }
 }
 
+//Throws error if parsedTags array doesn't include each parsedSendTo item
 const alignmentValidation = (stateSlice) => {
     const {parsedTags, parsedSendTo} = stateSlice;
     for(let item in parsedSendTo){
         if(parsedTags.includes(parsedSendTo[item])) {
             continue;
         } else {
-            throw new ValidationError("Include only tags found in the Tags section.", "sendTo")
+            throw new ValidationError("Include only tags found in the Tags section.", "align")
         }
     }
 }
 
+//Updates error state if error is caught. Else, nullifies error state.
 const tryCatch = (stateSlice, validator, stateUpdate) => {
     try {
         validator(stateSlice)
@@ -58,7 +71,8 @@ const tryCatch = (stateSlice, validator, stateUpdate) => {
     stateUpdate(null)
 }
 
-export const validateJson = (state, updateTagsError, updateConfigError, updateSendToError, updateAndOrError, updateTagAlignmentError) => {
+//Returns a list of errors or undefined items
+export const validateInput = (state, updateTagsError, updateConfigError, updateSendToError, updateAndOrError, updateTagAlignmentError) => {
     const { tags, config, sendTo, sendType } = state
     const parsedTags = tags.split(",")
     const parsedSendTo = sendTo.split(",")
